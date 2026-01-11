@@ -1,0 +1,208 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* 
+ * Design System: Modern Minimalist
+ * Primary: Blue #2563EB
+ * Based on project requirements document
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Semantic colors for whiteboard */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* Modern Minimalist - Light Mode */
+  /* Background & Surface */
+  --background: oklch(1 0 0);
+  /* #FFFFFF */
+  --foreground: oklch(0.145 0 0);
+  /* #111827 Gray 900 */
+
+  /* Card */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+
+  /* Popover */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+
+  /* Primary - Blue 600 #2563EB */
+  --primary: oklch(0.546 0.245 262.881);
+  --primary-foreground: oklch(0.985 0 0);
+
+  /* Secondary - Purple 500 #8B5CF6 */
+  --secondary: oklch(0.585 0.233 292.788);
+  --secondary-foreground: oklch(0.985 0 0);
+
+  /* Muted - Gray 50/100 */
+  --muted: oklch(0.968 0.001 286.375);
+  /* #F9FAFB */
+  --muted-foreground: oklch(0.556 0 0);
+  /* #6B7280 Gray 500 */
+
+  /* Accent - Amber 500 #F59E0B */
+  --accent: oklch(0.795 0.16 75.697);
+  --accent-foreground: oklch(0.145 0 0);
+
+  /* Destructive - Red 500 #EF4444 */
+  --destructive: oklch(0.577 0.245 27.325);
+
+  /* Border & Input */
+  --border: oklch(0.922 0.004 286.32);
+  /* #E5E7EB Gray 200 */
+  --input: oklch(0.922 0.004 286.32);
+  --ring: oklch(0.546 0.245 262.881);
+  /* Primary blue */
+
+  /* Semantic Colors */
+  --success: oklch(0.648 0.15 160);
+  /* #10B981 Green 500 */
+  --warning: oklch(0.795 0.16 75.697);
+  /* #F59E0B Amber 500 */
+  --info: oklch(0.623 0.214 259.815);
+  /* #3B82F6 Blue 500 */
+
+  /* Chart Colors */
+  --chart-1: oklch(0.546 0.245 262.881);
+  --chart-2: oklch(0.585 0.233 292.788);
+  --chart-3: oklch(0.795 0.16 75.697);
+  --chart-4: oklch(0.648 0.15 160);
+  --chart-5: oklch(0.577 0.245 27.325);
+
+  /* Sidebar */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.546 0.245 262.881);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.968 0.001 286.375);
+  --sidebar-accent-foreground: oklch(0.145 0 0);
+  --sidebar-border: oklch(0.922 0.004 286.32);
+  --sidebar-ring: oklch(0.546 0.245 262.881);
+}
+
+.dark {
+  /* Modern Minimalist - Dark Mode */
+  /* Background - Slate 900 #0F172A */
+  --background: oklch(0.208 0.042 265.755);
+  --foreground: oklch(0.968 0.007 247.858);
+  /* #F1F5F9 Slate 100 */
+
+  /* Card - Slate 800 #1E293B */
+  --card: oklch(0.279 0.041 260.031);
+  --card-foreground: oklch(0.968 0.007 247.858);
+
+  /* Popover */
+  --popover: oklch(0.279 0.041 260.031);
+  --popover-foreground: oklch(0.968 0.007 247.858);
+
+  /* Primary - Blue 500 (lighter for dark mode) */
+  --primary: oklch(0.623 0.214 259.815);
+  --primary-foreground: oklch(0.145 0 0);
+
+  /* Secondary - Purple 400 */
+  --secondary: oklch(0.714 0.203 305.504);
+  --secondary-foreground: oklch(0.145 0 0);
+
+  /* Muted - Slate 800 */
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  /* #94A3B8 Slate 400 */
+
+  /* Accent - Amber 400 */
+  --accent: oklch(0.828 0.189 84.429);
+  --accent-foreground: oklch(0.145 0 0);
+
+  /* Destructive - Red 400 */
+  --destructive: oklch(0.704 0.191 22.216);
+
+  /* Border & Input - Slate 700 #334155 */
+  --border: oklch(0.391 0.033 259.733);
+  --input: oklch(0.391 0.033 259.733);
+  --ring: oklch(0.623 0.214 259.815);
+
+  /* Semantic Colors */
+  --success: oklch(0.765 0.177 163.223);
+  --warning: oklch(0.828 0.189 84.429);
+  --info: oklch(0.705 0.191 256.096);
+
+  /* Chart Colors */
+  --chart-1: oklch(0.623 0.214 259.815);
+  --chart-2: oklch(0.714 0.203 305.504);
+  --chart-3: oklch(0.828 0.189 84.429);
+  --chart-4: oklch(0.765 0.177 163.223);
+  --chart-5: oklch(0.704 0.191 22.216);
+
+  /* Sidebar */
+  --sidebar: oklch(0.279 0.041 260.031);
+  --sidebar-foreground: oklch(0.968 0.007 247.858);
+  --sidebar-primary: oklch(0.623 0.214 259.815);
+  --sidebar-primary-foreground: oklch(0.968 0.007 247.858);
+  --sidebar-accent: oklch(0.391 0.033 259.733);
+  --sidebar-accent-foreground: oklch(0.968 0.007 247.858);
+  --sidebar-border: oklch(0.391 0.033 259.733);
+  --sidebar-ring: oklch(0.623 0.214 259.815);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+  }
+}
