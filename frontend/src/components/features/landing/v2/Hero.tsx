@@ -55,19 +55,6 @@ const titleWordVariants = {
     }),
 }
 
-const glowVariants = {
-    initial: { opacity: 0, scale: 0.8 },
-    animate: {
-        opacity: [0.4, 0.8, 0.4],
-        scale: [1, 1.2, 1],
-        transition: {
-            duration: 4,
-            repeat: Infinity,
-            ease: 'easeInOut' as Easing,
-        },
-    },
-}
-
 // Animated typing cursor
 function TypewriterCursor() {
     return (
@@ -248,21 +235,16 @@ export function Hero() {
     return (
         <section className="relative min-h-screen overflow-hidden">
             <AnimatedMeshGradient />
-            <FloatingParticles count={35} />
+            <FloatingParticles count={12} />
 
-            {/* Hero glow orbs */}
-            <motion.div
-                className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none"
-                variants={glowVariants}
-                initial="initial"
-                animate="animate"
+            {/* Hero glow orbs - optimized with reduced blur and GPU acceleration */}
+            <div
+                className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 rounded-full blur-[50px] pointer-events-none will-change-transform"
+                style={{ transform: 'translateZ(0)' }}
             />
-            <motion.div
-                className="absolute top-1/3 right-1/4 w-80 h-80 bg-secondary/20 rounded-full blur-[100px] pointer-events-none"
-                variants={glowVariants}
-                initial="initial"
-                animate="animate"
-                style={{ animationDelay: '1s' }}
+            <div
+                className="absolute top-1/3 right-1/4 w-80 h-80 bg-secondary/15 rounded-full blur-[50px] pointer-events-none will-change-transform"
+                style={{ transform: 'translateZ(0)' }}
             />
 
             <motion.div

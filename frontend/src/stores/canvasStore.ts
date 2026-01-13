@@ -12,6 +12,8 @@ import type { Stroke, Point, ToolType } from '@/types'
 interface CanvasState {
   // All completed strokes on the canvas
   strokes: Stroke[]
+  // Remote strokes being drawn by other users (in-progress)
+  remoteStrokes: Map<string, Stroke>
   // Undo stack (previous states)
   undoStack: Stroke[][]
   // Redo stack (future states)
@@ -27,9 +29,14 @@ interface CanvasState {
     color: string,
     size: number,
     tool: ToolType
-  ) => void
+  ) => Stroke | null
   addPoint: (point: Point) => void
-  endStroke: () => void
+  endStroke: () => Stroke | null
+
+  // Remote stroke actions (from other users)
+  addRemoteStroke: (stroke: Stroke) => void
+  updateRemoteStroke: (strokeId: string, point: Point) => void
+  endRemoteStroke: (strokeId: string) => void
 
   // History actions
   undo: () => void
@@ -40,6 +47,9 @@ interface CanvasState {
   // Canvas actions
   clear: () => void
   loadStrokes: (strokes: Stroke[]) => void
+
+  // Get all strokes for rendering (completed + remote in-progress)
+  getAllStrokes: () => Stroke[]
 }
 
 // Maximum history size to prevent memory issues
@@ -47,6 +57,7 @@ const MAX_HISTORY_SIZE = 50
 
 export const useCanvasStore = create<CanvasState>((set, get) => ({
   strokes: [],
+  remoteStrokes: new Map(),
   undoStack: [],
   redoStack: [],
   currentStroke: null,
@@ -62,6 +73,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
       timestamp: Date.now(),
     }
     set({ currentStroke: stroke, isDrawing: true })
+    return stroke
   },
 
   addPoint: (point) => {
@@ -80,7 +92,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
     const { currentStroke, strokes, undoStack } = get()
     if (!currentStroke) {
       set({ isDrawing: false })
-      return
+      return null
     }
 
     // Only save strokes with more than 1 point (avoid clicks)
@@ -95,9 +107,49 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
         currentStroke: null,
         isDrawing: false,
       })
+      return currentStroke
     } else {
       set({ currentStroke: null, isDrawing: false })
+      return null
     }
+  },
+
+  // Remote stroke handlers for real-time collaboration
+  addRemoteStroke: (stroke) => {
+    set((state) => {
+      const newRemoteStrokes = new Map(state.remoteStrokes)
+      newRemoteStrokes.set(stroke.id, stroke)
+      return { remoteStrokes: newRemoteStrokes }
+    })
+  },
+
+  updateRemoteStroke: (strokeId, point) => {
+    set((state) => {
+      const existingStroke = state.remoteStrokes.get(strokeId)
+      if (!existingStroke) return state
+
+      const newRemoteStrokes = new Map(state.remoteStrokes)
+      newRemoteStrokes.set(strokeId, {
+        ...existingStroke,
+        points: [...existingStroke.points, point],
+      })
+      return { remoteStrokes: newRemoteStrokes }
+    })
+  },
+
+  endRemoteStroke: (strokeId) => {
+    set((state) => {
+      const stroke = state.remoteStrokes.get(strokeId)
+      if (!stroke) return state
+
+      const newRemoteStrokes = new Map(state.remoteStrokes)
+      newRemoteStrokes.delete(strokeId)
+
+      return {
+        strokes: [...state.strokes, stroke],
+        remoteStrokes: newRemoteStrokes,
+      }
+    })
   },
 
   undo: () => {
@@ -139,6 +191,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
 
     set({
       strokes: [],
+      remoteStrokes: new Map(),
       undoStack: [...undoStack, strokes].slice(-MAX_HISTORY_SIZE),
       redoStack: [],
       currentStroke: null,
@@ -149,10 +202,17 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   loadStrokes: (strokes) => {
     set({
       strokes,
+      remoteStrokes: new Map(),
       undoStack: [],
       redoStack: [],
       currentStroke: null,
       isDrawing: false,
     })
   },
+
+  getAllStrokes: () => {
+    const { strokes, remoteStrokes } = get()
+    return [...strokes, ...Array.from(remoteStrokes.values())]
+  },
 }))
+

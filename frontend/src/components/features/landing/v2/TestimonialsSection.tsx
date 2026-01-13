@@ -47,6 +47,53 @@ const testimonials = [
     }
 ]
 
+// Memoized testimonial card component for better performance
+function TestimonialCard({
+    testimonial,
+    index,
+    scrollYProgress
+}: {
+    testimonial: typeof testimonials[0]
+    index: number
+    scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress']
+}) {
+    // Pre-calculate animation ranges - extended for slower, smoother feel
+    const staggerDelay = index * 0.05
+    const animStart = 0.05 + staggerDelay
+    const animEnd = 0.65 + staggerDelay
+
+    const x = useTransform(scrollYProgress, [animStart, animEnd], [testimonial.direction.x, 0])
+    const y = useTransform(scrollYProgress, [animStart, animEnd], [testimonial.direction.y, 0])
+    const opacity = useTransform(scrollYProgress, [animStart, animEnd], [0, 1])
+
+    return (
+        <motion.div
+            style={{ x, y, opacity }}
+            className={cn(
+                "relative p-6 md:p-8 rounded-2xl border bg-card shadow-xl",
+                "transform-gpu will-change-transform",
+                "hover:shadow-2xl hover:border-primary/30 transition-shadow duration-300"
+            )}
+        >
+            <div className="flex flex-col h-full gap-4">
+                <p className="text-base md:text-lg font-medium leading-relaxed flex-1 text-foreground/90">
+                    "{testimonial.content}"
+                </p>
+
+                <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center text-primary font-bold text-sm">
+                        {testimonial.avatar}
+                    </div>
+                    <div>
+                        <div className="font-semibold text-foreground text-sm">{testimonial.author}</div>
+                        <div className="text-xs text-muted-foreground">{testimonial.role}</div>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    )
+}
+
 export function TestimonialsSection() {
     const containerRef = useRef<HTMLDivElement>(null)
     const { scrollYProgress } = useScroll({
@@ -70,71 +117,19 @@ export function TestimonialsSection() {
                         Loved by <span className="text-primary">innovators</span>
                     </motion.h2>
 
-                    {/* Big Bang grid layout */}
+                    {/* Big Bang grid layout - optimized with memoized cards */}
                     <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-                        {testimonials.map((testimonial, index) => {
-                            // Staggered animation - each card starts slightly later
-                            const staggerDelay = index * 0.03
-                            const animStart = 0.1 + staggerDelay
-                            const animEnd = 0.5 + staggerDelay
-
-                            const x = useTransform(
-                                scrollYProgress,
-                                [animStart, animEnd],
-                                [testimonial.direction.x, 0]
-                            )
-                            const y = useTransform(
-                                scrollYProgress,
-                                [animStart, animEnd],
-                                [testimonial.direction.y, 0]
-                            )
-                            const scale = useTransform(
-                                scrollYProgress,
-                                [animStart, animStart + 0.1, animEnd],
-                                [0.2, 0.6, 1]
-                            )
-                            const opacity = useTransform(
-                                scrollYProgress,
-                                [animStart, animStart + 0.15, animEnd],
-                                [0, 0.7, 1]
-                            )
-                            const rotate = useTransform(
-                                scrollYProgress,
-                                [animStart, animEnd],
-                                [(index % 2 === 0 ? 20 : -20), 0]
-                            )
-
-                            return (
-                                <motion.div
-                                    key={index}
-                                    style={{ x, y, scale, opacity, rotate }}
-                                    className={cn(
-                                        "relative p-6 md:p-8 rounded-2xl border bg-card shadow-xl",
-                                        "transform-gpu will-change-transform",
-                                        "hover:shadow-2xl hover:border-primary/30 transition-shadow duration-300"
-                                    )}
-                                >
-                                    <div className="flex flex-col h-full gap-4">
-                                        <p className="text-base md:text-lg font-medium leading-relaxed flex-1 text-foreground/90">
-                                            "{testimonial.content}"
-                                        </p>
-
-                                        <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center text-primary font-bold text-sm">
-                                                {testimonial.avatar}
-                                            </div>
-                                            <div>
-                                                <div className="font-semibold text-foreground text-sm">{testimonial.author}</div>
-                                                <div className="text-xs text-muted-foreground">{testimonial.role}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )
-                        })}
+                        {testimonials.map((testimonial, index) => (
+                            <TestimonialCard
+                                key={index}
+                                testimonial={testimonial}
+                                index={index}
+                                scrollYProgress={scrollYProgress}
+                            />
+                        ))}
                     </div>
 
-                    {/* Scroll hint at bottom */}
+                    {/* Scroll hint at bottom - simplified animation */}
                     <motion.div
                         className="absolute bottom-8 left-1/2 -translate-x-1/2 text-muted-foreground/50 text-sm flex flex-col items-center gap-2"
                         style={{
@@ -142,16 +137,13 @@ export function TestimonialsSection() {
                         }}
                     >
                         <span>Scroll to continue</span>
-                        <motion.div
-                            animate={{ y: [0, 8, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="w-5 h-8 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-1"
-                        >
-                            <div className="w-1 h-2 bg-muted-foreground/50 rounded-full" />
-                        </motion.div>
+                        <div className="w-5 h-8 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-1">
+                            <div className="w-1 h-2 bg-muted-foreground/50 rounded-full animate-bounce" />
+                        </div>
                     </motion.div>
                 </div>
             </div>
         </section>
     )
 }
+

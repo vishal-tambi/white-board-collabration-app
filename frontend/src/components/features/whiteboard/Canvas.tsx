@@ -1,9 +1,13 @@
 import { useEffect } from 'react'
 import { useCanvas } from '@/hooks/useCanvas'
 import { cn } from '@/lib/utils'
+import type { Stroke, Point } from '@/types'
 
 interface CanvasProps {
   className?: string
+  onStrokeStart?: (stroke: Stroke) => void
+  onStrokeUpdate?: (strokeId: string, point: Point) => void
+  onStrokeEnd?: (strokeId: string) => void
 }
 
 /**
@@ -12,7 +16,12 @@ interface CanvasProps {
  * Main drawing surface for the whiteboard.
  * Handles all pointer interactions for drawing.
  */
-export function Canvas({ className }: CanvasProps) {
+export function Canvas({
+  className,
+  onStrokeStart,
+  onStrokeUpdate,
+  onStrokeEnd
+}: CanvasProps) {
   const {
     canvasRef,
     initCanvas,
@@ -21,7 +30,11 @@ export function Canvas({ className }: CanvasProps) {
     handlePointerUp,
     handlePointerLeave,
     getCursorStyle,
-  } = useCanvas()
+  } = useCanvas({
+    onStrokeStart,
+    onStrokeUpdate,
+    onStrokeEnd,
+  })
 
   // Initialize canvas on mount
   useEffect(() => {
@@ -44,3 +57,4 @@ export function Canvas({ className }: CanvasProps) {
     />
   )
 }
+

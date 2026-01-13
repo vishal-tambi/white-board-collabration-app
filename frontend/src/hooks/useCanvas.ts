@@ -2,6 +2,7 @@ import { useCallback, useRef, useEffect } from 'react'
 import { useToolbarStore } from '@/stores/toolbarStore'
 import { useCanvasStore } from '@/stores/canvasStore'
 import { getPointFromEvent, redrawCanvas } from '@/utils/canvas'
+import type { Stroke, Point } from '@/types'
 
 /**
  * useCanvas Hook
@@ -9,9 +10,18 @@ import { getPointFromEvent, redrawCanvas } from '@/utils/canvas'
  * Manages canvas drawing interactions and state synchronization.
  * Handles mouse, touch, and pointer events for drawing.
  */
-export function useCanvas() {
+
+interface UseCanvasOptions {
+  onStrokeStart?: (stroke: Stroke) => void
+  onStrokeUpdate?: (strokeId: string, point: Point) => void
+  onStrokeEnd?: (strokeId: string) => void
+}
+
+export function useCanvas(options: UseCanvasOptions = {}) {
+  const { onStrokeStart, onStrokeUpdate, onStrokeEnd } = options
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const contextRef = useRef<CanvasRenderingContext2D | null>(null)
+  const currentStrokeIdRef = useRef<string | null>(null)
 
   // Toolbar state
   const { activeTool, strokeColor, strokeSize } = useToolbarStore()
@@ -19,6 +29,7 @@ export function useCanvas() {
   // Canvas state
   const {
     strokes,
+    remoteStrokes,
     currentStroke,
     isDrawing,
     startStroke,
@@ -52,9 +63,12 @@ export function useCanvas() {
 
     contextRef.current = ctx
 
+    // Get all strokes including remote ones for rendering
+    const allStrokes = [...strokes, ...Array.from(remoteStrokes.values())]
+
     // Redraw existing strokes
-    redrawCanvas(ctx, strokes, currentStroke)
-  }, [strokes, currentStroke])
+    redrawCanvas(ctx, allStrokes, currentStroke)
+  }, [strokes, remoteStrokes, currentStroke])
 
   // Handle pointer down (start drawing)
   const handlePointerDown = useCallback(
@@ -72,9 +86,15 @@ export function useCanvas() {
       // Use background color for eraser visual feedback
       const color = activeTool === 'eraser' ? '#FFFFFF' : strokeColor
 
-      startStroke(point, color, strokeSize, activeTool)
+      const stroke = startStroke(point, color, strokeSize, activeTool)
+
+      if (stroke) {
+        currentStrokeIdRef.current = stroke.id
+        // Emit socket event for stroke start
+        onStrokeStart?.(stroke)
+      }
     },
-    [activeTool, strokeColor, strokeSize, startStroke]
+    [activeTool, strokeColor, strokeSize, startStroke, onStrokeStart]
   )
 
   // Handle pointer move (add points while drawing)
@@ -87,30 +107,49 @@ export function useCanvas() {
 
       const point = getPointFromEvent(event.nativeEvent, canvas)
       addPoint(point)
+
+      // Emit socket event for stroke update
+      if (currentStrokeIdRef.current) {
+        onStrokeUpdate?.(currentStrokeIdRef.current, point)
+      }
     },
-    [isDrawing, addPoint]
+    [isDrawing, addPoint, onStrokeUpdate]
   )
 
   // Handle pointer up (end drawing)
   const handlePointerUp = useCallback(() => {
     if (!isDrawing) return
-    endStroke()
-  }, [isDrawing, endStroke])
+
+    const completedStroke = endStroke()
+
+    // Emit socket event for stroke end
+    if (currentStrokeIdRef.current && completedStroke) {
+      onStrokeEnd?.(currentStrokeIdRef.current)
+    }
+    currentStrokeIdRef.current = null
+  }, [isDrawing, endStroke, onStrokeEnd])
 
   // Handle pointer leave
   const handlePointerLeave = useCallback(() => {
     if (isDrawing) {
-      endStroke()
+      const completedStroke = endStroke()
+
+      if (currentStrokeIdRef.current && completedStroke) {
+        onStrokeEnd?.(currentStrokeIdRef.current)
+      }
+      currentStrokeIdRef.current = null
     }
-  }, [isDrawing, endStroke])
+  }, [isDrawing, endStroke, onStrokeEnd])
 
   // Redraw canvas when strokes change
   useEffect(() => {
     const ctx = contextRef.current
     if (!ctx) return
 
-    redrawCanvas(ctx, strokes, currentStroke)
-  }, [strokes, currentStroke])
+    // Include remote strokes in rendering
+    const allStrokes = [...strokes, ...Array.from(remoteStrokes.values())]
+    redrawCanvas(ctx, allStrokes, currentStroke)
+  }, [strokes, remoteStrokes, currentStroke])
 
   // Handle window resize
   useEffect(() => {
@@ -146,3 +185,4 @@ export function useCanvas() {
     getCursorStyle,
   }
 }
+

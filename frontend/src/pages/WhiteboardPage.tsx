@@ -7,9 +7,10 @@ import { MobileToolbar } from '@/components/features/whiteboard/MobileToolbar'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { useCanvasStore } from '@/stores/canvasStore'
 import { useToolbarStore } from '@/stores/toolbarStore'
+import { useRoom } from '@/hooks/useRoom'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import { downloadCanvas } from '@/utils/canvas'
-import { PenLine, Copy, Check } from 'lucide-react'
+import { PenLine, Copy, Check, Wifi, WifiOff, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 /**
@@ -17,12 +18,23 @@ import { Button } from '@/components/ui/button'
  *
  * Main whiteboard canvas page with responsive toolbar and header.
  * Uses MobileToolbar on small screens, desktop Toolbar on larger screens.
+ * Integrates with Socket.IO for real-time collaboration.
  */
 export function WhiteboardPage() {
   const { roomId } = useParams<{ roomId: string }>()
   const canvasContainerRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
   const isMobile = useIsMobile()
+
+  // Socket connection and room management
+  const {
+    status,
+    users,
+    currentUser,
+    emitStrokeStart,
+    emitStrokeUpdate,
+    emitStrokeEnd
+  } = useRoom(roomId)
 
   const { undo, redo } = useCanvasStore()
   const { setTool } = useToolbarStore()
@@ -135,9 +147,39 @@ export function WhiteboardPage() {
               )}
             </Button>
           </div>
+
+          {/* Connection Status */}
+          <div className="flex items-center gap-2">
+            {status === 'connected' ? (
+              <div className="flex items-center gap-1.5 text-green-500" title="Connected">
+                <Wifi className="size-4" />
+                <span className="hidden sm:inline text-xs">{users.length} online</span>
+              </div>
+            ) : status === 'connecting' ? (
+              <div className="flex items-center gap-1.5 text-yellow-500" title="Connecting...">
+                <Wifi className="size-4 animate-pulse" />
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-red-500" title="Disconnected">
+                <WifiOff className="size-4" />
+              </div>
+            )}
+          </div>
         </div>
 
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          {/* User indicator */}
+          {currentUser && (
+            <div
+              className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium"
+              style={{ backgroundColor: `${currentUser.color}20`, color: currentUser.color }}
+            >
+              <Users className="size-3" />
+              <span className="hidden sm:inline">{currentUser.name}</span>
+            </div>
+          )}
+          <ThemeToggle />
+        </div>
       </header>
 
       {/* Main content */}
@@ -154,7 +196,11 @@ export function WhiteboardPage() {
           ref={canvasContainerRef}
           className="flex-1 bg-white dark:bg-gray-900"
         >
-          <Canvas />
+          <Canvas
+            onStrokeStart={emitStrokeStart}
+            onStrokeUpdate={emitStrokeUpdate}
+            onStrokeEnd={emitStrokeEnd}
+          />
         </div>
 
         {/* Mobile Toolbar - floating button + sheet */}
@@ -163,3 +209,4 @@ export function WhiteboardPage() {
     </div>
   )
 }
+

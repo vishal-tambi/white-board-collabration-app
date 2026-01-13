@@ -24,16 +24,16 @@ function generateParticles(count: number): Particle[] {
     }))
 }
 
-export function FloatingParticles({ count = 15 }: { count?: number }) {
-    // Limit particles for performance
-    const particles = useMemo(() => generateParticles(Math.min(count, 20)), [count])
+export function FloatingParticles({ count = 12 }: { count?: number }) {
+    // Limit particles for performance - max 12 for smooth 60fps
+    const particles = useMemo(() => generateParticles(Math.min(count, 12)), [count])
 
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
             {particles.map((particle) => (
                 <div
                     key={particle.id}
-                    className="absolute rounded-full animate-float"
+                    className="absolute rounded-full animate-float will-change-transform"
                     style={{
                         left: `${particle.x}%`,
                         top: `${particle.y}%`,
@@ -43,9 +43,11 @@ export function FloatingParticles({ count = 15 }: { count?: number }) {
                         opacity: 0.12,
                         animationDuration: `${particle.duration}s`,
                         animationDelay: `${particle.delay}s`,
+                        transform: 'translateZ(0)',
                     }}
                 />
             ))}
         </div>
     )
 }
+
