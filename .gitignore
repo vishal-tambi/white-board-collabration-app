@@ -1,0 +1,31 @@
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project documentation files (not for GitHub)
+pdf_content.txt
+gemini-rule-2.md
+Comprehensive Project Analysis_ Collaborative Whiteboard Application.pdf
+Comprehensive_Project_Analysis.md
+Web Design & Animation Blueprint .pdf
