@@ -87,7 +87,7 @@ export function MobileToolbar({ onDownload }: MobileToolbarProps) {
         </div>
 
         {/* Current tool indicator */}
-        <div className="absolute top-4 right-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="absolute top-4 left-4 flex items-center gap-2 text-sm text-muted-foreground">
           <div
             className="size-4 rounded-full border-2 border-border"
             style={{
