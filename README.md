@@ -10,16 +10,15 @@ A next-generation real-time collaborative whiteboard application designed for se
 
 ## 📸 Screenshots & Demo
 
-> **Note:** Screenshots coming soon!
+### 🎥 Watch the Full Demo
+See the real-time collaboration features in action:
+
+[![Watch the Demo](https://cdn.loom.com/sessions/thumbnails/0448e1ca72fa4c5ab536dbecc096c88a-with-play.gif)](https://www.loom.com/share/0448e1ca72fa4c5ab536dbecc096c88a)
+
+> **Note:** More detailed static screenshots coming soon!
 
 <!-- PLACEHOLDER: Main Dashboard View -->
 <!-- <img src="path/to/dashboard-screenshot.png" alt="Dashboard View" width="100%"> -->
-
-<!-- PLACEHOLDER: Whiteboard Drawing Experience -->
-<!-- <img src="path/to/whiteboard-screenshot.png" alt="Whiteboard Experience" width="100%"> -->
-
-<!-- PLACEHOLDER: Real-time Collaboration Demo (GIF) -->
-<!-- <img src="path/to/collaboration-demo.gif" alt="Real-time Collaboration" width="100%"> -->
 
 ---
 
