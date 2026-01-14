@@ -1,4 +1,15 @@
-import { Pen, Eraser } from 'lucide-react'
+import {
+  Pen,
+  Eraser,
+  MousePointer2,
+  Hand,
+  Square,
+  Circle,
+  ArrowRight,
+  Minus,
+  StickyNote,
+  Pointer,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Tooltip,
@@ -19,19 +30,40 @@ interface ToolButtonProps {
 const toolIcons: Record<ToolType, React.ReactNode> = {
   pen: <Pen className="size-5" />,
   eraser: <Eraser className="size-5" />,
-  select: null, // Not implemented yet
+  select: <MousePointer2 className="size-5" />,
+  pan: <Hand className="size-5" />,
+  rectangle: <Square className="size-5" />,
+  circle: <Circle className="size-5" />,
+  arrow: <ArrowRight className="size-5" />,
+  line: <Minus className="size-5" />,
+  note: <StickyNote className="size-5" />,
+  laser: <Pointer className="size-5" />,
 }
 
 const toolLabels: Record<ToolType, string> = {
   pen: 'Pen',
   eraser: 'Eraser',
   select: 'Select',
+  pan: 'Pan',
+  rectangle: 'Rectangle',
+  circle: 'Circle',
+  arrow: 'Arrow',
+  line: 'Line',
+  note: 'Sticky Note',
+  laser: 'Laser Pointer',
 }
 
 const toolShortcuts: Record<ToolType, string> = {
   pen: 'P',
   eraser: 'E',
   select: 'V',
+  pan: 'H',
+  rectangle: 'R',
+  circle: 'C',
+  arrow: 'A',
+  line: 'L',
+  note: 'N',
+  laser: 'S',
 }
 
 /**

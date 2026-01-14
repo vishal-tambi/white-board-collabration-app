@@ -73,7 +73,8 @@ export function useCanvas(options: UseCanvasOptions = {}) {
   // Handle pointer down (start drawing)
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
-      if (activeTool === 'select') return
+      // Only handle pen and eraser tools (shapes/notes/etc handled elsewhere)
+      if (activeTool !== 'pen' && activeTool !== 'eraser') return
 
       const canvas = canvasRef.current
       if (!canvas) return

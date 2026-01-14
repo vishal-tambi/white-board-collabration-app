@@ -4,7 +4,18 @@
  * Type definitions for the toolbar and tool-related functionality.
  */
 
-import type { ToolType } from './canvas.types'
+/** All available tools including new shape and interaction tools */
+export type ToolType =
+  | 'pen'
+  | 'eraser'
+  | 'select'
+  | 'pan'
+  | 'rectangle'
+  | 'circle'
+  | 'arrow'
+  | 'line'
+  | 'note'
+  | 'laser'
 
 /** Configuration for a single tool */
 export interface ToolConfig {

@@ -2,6 +2,7 @@
  * Canvas Types
  *
  * Type definitions for the whiteboard canvas drawing system.
+ * Supports multiple element types: strokes, shapes, sticky notes, and laser pointers.
  */
 
 /** A single point on the canvas with optional pressure data */
@@ -11,9 +12,6 @@ export interface Point {
   /** Pressure from 0-1, used for variable stroke width */
   pressure?: number
 }
-
-/** Drawing tool types available in the toolbar */
-export type ToolType = 'pen' | 'eraser' | 'select'
 
 /** A completed stroke on the canvas */
 export interface Stroke {
@@ -25,8 +23,8 @@ export interface Stroke {
   color: string
   /** Stroke width in pixels */
   size: number
-  /** Tool used to create this stroke */
-  tool: ToolType
+  /** Tool used to create this stroke (only pen/eraser create strokes) */
+  tool: 'pen' | 'eraser'
   /** Timestamp when stroke was created */
   timestamp: number
 }
@@ -35,7 +33,7 @@ export interface Stroke {
 export interface StrokeOptions {
   color: string
   size: number
-  tool: ToolType
+  tool: 'pen' | 'eraser'
 }
 
 /** Canvas dimensions */
@@ -83,3 +81,78 @@ export const DEFAULT_STROKE_OPTIONS: StrokeRenderOptions = {
     cap: true,
   },
 }
+
+// ============================================================================
+// NEW: Extended Canvas Element Types
+// ============================================================================
+
+/** Base interface for all canvas elements */
+export interface BaseElement {
+  id: string
+  type: 'stroke' | 'shape' | 'note' | 'laser'
+  timestamp: number
+  userId?: string
+}
+
+/** Shape types for geometric drawing */
+export type ShapeType = 'rectangle' | 'circle' | 'arrow' | 'line'
+
+/** Geometric shape element */
+export interface ShapeElement extends BaseElement {
+  type: 'shape'
+  shapeType: ShapeType
+  start: Point
+  end: Point
+  color: string
+  strokeWidth: number
+  fillColor?: string
+}
+
+/** Sticky note element */
+export interface NoteElement extends BaseElement {
+  type: 'note'
+  position: Point
+  width: number
+  height: number
+  text: string
+  color: string
+  fontSize: number
+}
+
+/** Laser pointer trail (temporary, auto-fades) */
+export interface LaserElement extends BaseElement {
+  type: 'laser'
+  points: Point[]
+  color: string
+  createdAt: number
+}
+
+/** Enhanced stroke element with type field for polymorphism */
+export interface StrokeElement extends BaseElement {
+  type: 'stroke'
+  points: Point[]
+  color: string
+  size: number
+  tool: 'pen' | 'eraser'
+}
+
+/** Unified canvas element type */
+export type CanvasElement = StrokeElement | ShapeElement | NoteElement | LaserElement
+
+/** Viewport state for pan and zoom */
+export interface Viewport {
+  x: number // Pan offset X
+  y: number // Pan offset Y
+  zoom: number // Zoom level (0.1 to 5.0)
+}
+
+/** Selection bounding box */
+export interface SelectionBounds {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+/** Grid background types */
+export type BackgroundType = 'none' | 'dot' | 'grid' | 'lined'

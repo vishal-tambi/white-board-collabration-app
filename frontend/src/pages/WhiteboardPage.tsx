@@ -6,6 +6,7 @@ import { Toolbar } from '@/components/features/whiteboard/Toolbar'
 import { MobileToolbar } from '@/components/features/whiteboard/MobileToolbar'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { useCanvasStore } from '@/stores/canvasStore'
+import { useElementsStore } from '@/stores/elementsStore'
 import { useToolbarStore } from '@/stores/toolbarStore'
 import { useRoom } from '@/hooks/useRoom'
 import { useIsMobile } from '@/hooks/useMediaQuery'
@@ -68,6 +69,13 @@ export function WhiteboardPage() {
         handleDownload()
       }
 
+      // Delete: Delete or Backspace (delete selected elements)
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault()
+        const { deleteSelected } = useElementsStore.getState()
+        deleteSelected()
+      }
+
       // Tool shortcuts
       if (!e.ctrlKey && !e.altKey && !e.metaKey) {
         switch (e.key.toLowerCase()) {
@@ -76,6 +84,30 @@ export function WhiteboardPage() {
             break
           case 'e':
             setTool('eraser')
+            break
+          case 'v':
+            setTool('select')
+            break
+          case 'h':
+            setTool('pan')
+            break
+          case 'r':
+            setTool('rectangle')
+            break
+          case 'c':
+            setTool('circle')
+            break
+          case 'a':
+            setTool('arrow')
+            break
+          case 'l':
+            setTool('line')
+            break
+          case 'n':
+            setTool('note')
+            break
+          case 's':
+            setTool('laser')
             break
         }
       }

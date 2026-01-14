@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { nanoid } from 'nanoid'
-import type { Stroke, Point, ToolType } from '@/types'
+import type { Stroke, Point } from '@/types'
 
 /**
  * Canvas Store
@@ -28,7 +28,7 @@ interface CanvasState {
     point: Point,
     color: string,
     size: number,
-    tool: ToolType
+    tool: 'pen' | 'eraser'
   ) => Stroke | null
   addPoint: (point: Point) => void
   endStroke: () => Stroke | null
