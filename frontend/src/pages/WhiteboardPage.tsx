@@ -34,7 +34,10 @@ export function WhiteboardPage() {
     currentUser,
     emitStrokeStart,
     emitStrokeUpdate,
-    emitStrokeEnd
+    emitStrokeEnd,
+    emitShapeStart,
+    emitShapeUpdate,
+    emitShapeEnd
   } = useRoom(roomId)
 
   const { undo, redo } = useCanvasStore()
@@ -232,6 +235,9 @@ export function WhiteboardPage() {
             onStrokeStart={emitStrokeStart}
             onStrokeUpdate={emitStrokeUpdate}
             onStrokeEnd={emitStrokeEnd}
+            onShapeStart={emitShapeStart}
+            onShapeUpdate={emitShapeUpdate}
+            onShapeEnd={emitShapeEnd}
           />
         </div>
 

@@ -14,6 +14,7 @@ import { config } from '../config'
 import { setupRoomHandlers } from './roomHandler'
 import { setupDrawingHandlers } from './drawingHandler'
 import { setupCanvasHandlers } from './canvasHandler'
+import { setupShapeHandlers } from './shapeHandler'
 
 type TypedServer = Server<ClientToServerEvents, ServerToClientEvents, Record<string, never>, SocketData>
 
@@ -45,6 +46,7 @@ export function initializeSocket(httpServer: HttpServer): TypedServer {
         setupRoomHandlers(io, socket)
         setupDrawingHandlers(io, socket)
         setupCanvasHandlers(io, socket)
+        setupShapeHandlers(io, socket)
 
         // Log disconnection
         socket.on('disconnect', (reason) => {

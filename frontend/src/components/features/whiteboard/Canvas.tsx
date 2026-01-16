@@ -8,13 +8,16 @@ import { StickyNote } from './StickyNote'
 import { drawShape } from '@/utils/shapes'
 import { getPointFromEvent } from '@/utils/canvas'
 import { cn } from '@/lib/utils'
-import type { Stroke, Point } from '@/types'
+import type { Stroke, Point, ShapeElement } from '@/types'
 
 interface CanvasProps {
   className?: string
   onStrokeStart?: (stroke: Stroke) => void
   onStrokeUpdate?: (strokeId: string, point: Point) => void
   onStrokeEnd?: (strokeId: string) => void
+  onShapeStart?: (shape: ShapeElement) => void
+  onShapeUpdate?: (shapeId: string, endPoint: Point) => void
+  onShapeEnd?: (shapeId: string) => void
 }
 
 /**
@@ -31,7 +34,10 @@ export function Canvas({
   className,
   onStrokeStart,
   onStrokeUpdate,
-  onStrokeEnd
+  onStrokeEnd,
+  onShapeStart,
+  onShapeUpdate,
+  onShapeEnd
 }: CanvasProps) {
   const { backgroundType } = useBackgroundStore()
   const { activeTool, strokeColor, strokeSize } = useToolbarStore()
@@ -218,6 +224,7 @@ export function Canvas({
           strokeSize
         )
         currentShapeIdRef.current = shape.id
+        onShapeStart?.(shape)
       } else if (activeTool === 'note') {
         // Create sticky note at click position
         createNote(point)
@@ -301,6 +308,7 @@ export function Canvas({
         currentShapeIdRef.current
       ) {
         updateShapeEnd(point)
+        onShapeUpdate?.(currentShapeIdRef.current, point)
       } else if (activeTool === 'laser' && currentLaserIdRef.current) {
         addLaserPoint(currentLaserIdRef.current, point)
       }
@@ -317,7 +325,10 @@ export function Canvas({
         ['rectangle', 'circle', 'arrow', 'line'].includes(activeTool) &&
         currentShapeIdRef.current
       ) {
-        completeShape()
+        const completedShape = completeShape()
+        if (completedShape) {
+          onShapeEnd?.(currentShapeIdRef.current)
+        }
         currentShapeIdRef.current = null
       } else if (activeTool === 'laser' && currentLaserIdRef.current) {
         // Laser auto-fades, just clear ref

@@ -32,6 +32,23 @@ export interface Stroke {
     timestamp: number
 }
 
+/** Shape types for geometric drawing */
+export type ShapeType = 'rectangle' | 'circle' | 'arrow' | 'line'
+
+/** Geometric shape element */
+export interface ShapeElement {
+    id: string
+    type: 'shape'
+    shapeType: ShapeType
+    start: Point
+    end: Point
+    color: string
+    strokeWidth: number
+    fillColor?: string
+    timestamp: number
+    userId?: string
+}
+
 // ============ Room Types ============
 
 /** User in a room */
@@ -70,6 +87,11 @@ export interface ClientToServerEvents {
     'stroke:end': (data: { roomId: string; strokeId: string }) => void
     'stroke:delete': (data: { roomId: string; strokeId: string }) => void
 
+    // Shape events
+    'shape:start': (data: { roomId: string; shape: ShapeElement }) => void
+    'shape:update': (data: { roomId: string; shapeId: string; endPoint: Point }) => void
+    'shape:end': (data: { roomId: string; shapeId: string }) => void
+
     // Canvas events
     'canvas:clear': (data: { roomId: string }) => void
     'canvas:undo': (data: { roomId: string }) => void
@@ -99,6 +121,11 @@ export interface ServerToClientEvents {
     'stroke:ended': (data: { userId: string; strokeId: string }) => void
     'stroke:deleted': (data: { userId: string; strokeId: string }) => void
 
+    // Shape events (from other users)
+    'shape:started': (data: { userId: string; shape: ShapeElement }) => void
+    'shape:updated': (data: { userId: string; shapeId: string; endPoint: Point }) => void
+    'shape:ended': (data: { userId: string; shapeId: string }) => void
+
     // Canvas events (from other users)
     'canvas:cleared': (data: { userId: string }) => void
     'canvas:strokes': (data: { strokes: Stroke[] }) => void
@@ -120,3 +147,4 @@ export interface SocketData {
     userColor: string
     roomId: string | null
 }
+

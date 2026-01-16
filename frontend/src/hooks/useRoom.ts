@@ -8,13 +8,15 @@ import type {
     RoomUser,
     Stroke,
     Point,
+    ShapeElement,
 } from '@/types'
 import { useCanvasStore } from '@/stores/canvasStore'
+import { useElementsStore } from '@/stores/elementsStore'
 
 /**
  * useRoom Hook
  *
- * Manages Socket.IO connection, room joining, and real-time stroke sync.
+ * Manages Socket.IO connection, room joining, and real-time stroke/shape sync.
  */
 
 type TypedSocket = Socket<ServerToClientEvents, ClientToServerEvents>
@@ -48,6 +50,9 @@ interface UseRoomReturn {
     emitStrokeStart: (stroke: Stroke) => void
     emitStrokeUpdate: (strokeId: string, point: Point) => void
     emitStrokeEnd: (strokeId: string) => void
+    emitShapeStart: (shape: ShapeElement) => void
+    emitShapeUpdate: (shapeId: string, endPoint: Point) => void
+    emitShapeEnd: (shapeId: string) => void
     emitCanvasClear: () => void
 }
 
@@ -57,11 +62,17 @@ export function useRoom(roomId: string | undefined): UseRoomReturn {
     const [users, setUsers] = useState<RoomUser[]>([])
     const [currentUser, setCurrentUser] = useState<RoomUser | null>(null)
 
+    // Canvas store actions (strokes)
     const loadStrokes = useCanvasStore((state) => state.loadStrokes)
     const addRemoteStroke = useCanvasStore((state) => state.addRemoteStroke)
     const updateRemoteStroke = useCanvasStore((state) => state.updateRemoteStroke)
     const endRemoteStroke = useCanvasStore((state) => state.endRemoteStroke)
     const clearCanvas = useCanvasStore((state) => state.clear)
+
+    // Elements store actions (shapes)
+    const addRemoteShape = useElementsStore((state) => state.addRemoteShape)
+    const updateRemoteShape = useElementsStore((state) => state.updateRemoteShape)
+    const completeRemoteShape = useElementsStore((state) => state.completeRemoteShape)
 
     // Initialize socket and join room
     useEffect(() => {
@@ -140,7 +151,7 @@ export function useRoom(roomId: string | undefined): UseRoomReturn {
             loadStrokes(strokes)
         })
 
-        // Real-time drawing events from other users
+        // Real-time stroke events from other users
         socket.on('stroke:started', ({ userId, stroke }) => {
             console.log('Remote stroke started:', userId, stroke.id)
             addRemoteStroke(stroke)
@@ -152,6 +163,21 @@ export function useRoom(roomId: string | undefined): UseRoomReturn {
 
         socket.on('stroke:ended', ({ strokeId }) => {
             endRemoteStroke(strokeId)
+        })
+
+        // Real-time shape events from other users
+        socket.on('shape:started', ({ userId, shape }) => {
+            console.log('Remote shape started:', userId, shape.id)
+            addRemoteShape(shape)
+        })
+
+        socket.on('shape:updated', ({ shapeId, endPoint }) => {
+            updateRemoteShape(shapeId, { end: endPoint })
+        })
+
+        socket.on('shape:ended', ({ shapeId }) => {
+            console.log('Remote shape ended:', shapeId)
+            completeRemoteShape(shapeId)
         })
 
         socket.on('canvas:cleared', ({ userId }) => {
@@ -172,7 +198,7 @@ export function useRoom(roomId: string | undefined): UseRoomReturn {
             socket.disconnect()
             socketRef.current = null
         }
-    }, [roomId, loadStrokes, addRemoteStroke, updateRemoteStroke, endRemoteStroke, clearCanvas])
+    }, [roomId, loadStrokes, addRemoteStroke, updateRemoteStroke, endRemoteStroke, clearCanvas, addRemoteShape, updateRemoteShape, completeRemoteShape])
 
     // Emit stroke start
     const emitStrokeStart = useCallback(
@@ -204,6 +230,36 @@ export function useRoom(roomId: string | undefined): UseRoomReturn {
         [roomId]
     )
 
+    // Emit shape start
+    const emitShapeStart = useCallback(
+        (shape: ShapeElement) => {
+            if (socketRef.current?.connected && roomId) {
+                socketRef.current.emit('shape:start', { roomId, shape })
+            }
+        },
+        [roomId]
+    )
+
+    // Emit shape update (new end point)
+    const emitShapeUpdate = useCallback(
+        (shapeId: string, endPoint: Point) => {
+            if (socketRef.current?.connected && roomId) {
+                socketRef.current.emit('shape:update', { roomId, shapeId, endPoint })
+            }
+        },
+        [roomId]
+    )
+
+    // Emit shape end
+    const emitShapeEnd = useCallback(
+        (shapeId: string) => {
+            if (socketRef.current?.connected && roomId) {
+                socketRef.current.emit('shape:end', { roomId, shapeId })
+            }
+        },
+        [roomId]
+    )
+
     // Emit canvas clear
     const emitCanvasClear = useCallback(() => {
         if (socketRef.current?.connected && roomId) {
@@ -218,6 +274,10 @@ export function useRoom(roomId: string | undefined): UseRoomReturn {
         emitStrokeStart,
         emitStrokeUpdate,
         emitStrokeEnd,
+        emitShapeStart,
+        emitShapeUpdate,
+        emitShapeEnd,
         emitCanvasClear,
     }
 }
+

@@ -5,7 +5,7 @@
  * These types ensure type-safety in real-time communication.
  */
 
-import type { Stroke, Point } from './canvas.types'
+import type { Stroke, Point, ShapeElement } from './canvas.types'
 import type { RoomUser } from './room.types'
 
 /** Events emitted by the client to the server */
@@ -23,6 +23,11 @@ export interface ClientToServerEvents {
   }) => void
   'stroke:end': (data: { roomId: string; strokeId: string }) => void
   'stroke:delete': (data: { roomId: string; strokeId: string }) => void
+
+  // Shape events
+  'shape:start': (data: { roomId: string; shape: ShapeElement }) => void
+  'shape:update': (data: { roomId: string; shapeId: string; endPoint: Point }) => void
+  'shape:end': (data: { roomId: string; shapeId: string }) => void
 
   // Canvas events
   'canvas:clear': (data: { roomId: string }) => void
@@ -52,6 +57,11 @@ export interface ServerToClientEvents {
   }) => void
   'stroke:ended': (data: { userId: string; strokeId: string }) => void
   'stroke:deleted': (data: { userId: string; strokeId: string }) => void
+
+  // Shape events (from other users)
+  'shape:started': (data: { userId: string; shape: ShapeElement }) => void
+  'shape:updated': (data: { userId: string; shapeId: string; endPoint: Point }) => void
+  'shape:ended': (data: { userId: string; shapeId: string }) => void
 
   // Canvas events (from other users)
   'canvas:cleared': (data: { userId: string }) => void
