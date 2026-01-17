@@ -74,32 +74,54 @@ git clone https://github.com/yourusername/white-board-collabration-app.git
 cd white-board-collabration-app
 ```
 
-#### 2. Backend Setup
-Navigate to the backend directory and install dependencies:
+#### 2. Install Dependencies
 ```bash
-cd backend
+# Install root dependencies (includes concurrently)
 npm install
+
+# Install frontend dependencies
+cd frontend && npm install && cd ..
+
+# Install backend dependencies
+cd backend && npm install && cd ..
 ```
+
+#### 3. Environment Setup
 Create a `.env` file in the `backend` directory:
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/whiteboard
 CORS_ORIGIN=http://localhost:5173
 ```
-Start the backend server:
+
+### Running the Application
+
+#### ⚡ Quick Start (Recommended)
+Run both frontend and backend simultaneously with a single command from the root:
 ```bash
+npm run dev
+```
+This starts both servers with color-coded, timestamped logs for easy debugging.
+
+#### 🔧 Manual Start (Alternative)
+If you prefer running them separately in different terminals:
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
 npm run dev
 ```
 
-#### 3. Frontend Setup
-Open a new terminal, navigate to the frontend directory and install dependencies:
+**Terminal 2 - Frontend:**
 ```bash
 cd frontend
-npm install
-```
-Start the frontend development server:
-```bash
 npm run dev
+```
+
+Or from root:
+```bash
+npm run dev:frontend  # Frontend only
+npm run dev:backend   # Backend only
 ```
 
 The application should now be running at `http://localhost:5173`.

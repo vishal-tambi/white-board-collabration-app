@@ -1,0 +1,15 @@
+{
+  "name": "white-board-collaboration-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --prefix \"[{time}] [{name}]\" --names \"⚡ FRONTEND,🚀 BACKEND\" --prefix-colors \"cyan.bold,magenta.bold\" --timestamp-format \"HH:mm:ss\" \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "build": "npm run build --prefix frontend && npm run build --prefix backend",
+    "start": "npm run start --prefix backend"
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
